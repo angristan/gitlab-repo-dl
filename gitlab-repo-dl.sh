@@ -33,10 +33,10 @@ if [ "$1" == "group" ]; then
 
         if [ ! -d "$REPO_PATH" ]; then
             echo "git clone $REPO_PATH"
-            git clone "$REPO_SSH_URL" "$REPO_PATH" --quiet
+            git clone "$REPO_SSH_URL" "$REPO_PATH"
         else
             echo "git pull $REPO_PATH"
-            (cd "$REPO_PATH" && git pull --quiet)
+            (cd "$REPO_PATH" && git pull)
         fi
     done
 elif [ "$1" == "all-repo-list" ]; then
@@ -70,10 +70,10 @@ elif [ "$1" == "from-list" ]; then
 
         if [ ! -d "$TARGET_DIR/$REPO_PATH" ]; then
             echo "git clone $REPO_PATH"
-            git clone "$REPO_SSH_URL" "$TARGET_DIR/$REPO_PATH" --quiet
+            git clone "$REPO_SSH_URL" "$TARGET_DIR/$REPO_PATH"
         else
             echo "git pull $REPO_PATH"
-            cd "$TARGET_DIR/$REPO_PATH" && git pull --quiet
+            (cd "$TARGET_DIR/$REPO_PATH" && git pull)
         fi
     done <"$LIST_FILE"
 fi
