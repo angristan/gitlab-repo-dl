@@ -8,4 +8,4 @@ jobs:
     - name: shellcheck
       uses: actions/bin/shellcheck@master
       with:
-        args: "*.sh -e SC2162"
+        args: "*.sh -e SC2162,SC2006"
