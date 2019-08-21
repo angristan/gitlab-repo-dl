@@ -11,7 +11,7 @@ Requirements: bash, curl, jq, sed, awk, grep
 ## Download all projects from a group
 
 ```sh
-bash gitlab_clone_group.sh <group_name>
+./gitlab-repo-dl.sh group <group_name>
 ```
 
 It will clone all repos in `group_name` to the `./group_name` folder. If a repo already exists, it will be pulled.
@@ -25,7 +25,7 @@ This is seperated in two scripts to prevent an API brute-force everytime you wan
 First, get all the repositories names including their namespace (= the whole path):
 
 ```sh
-bash gitlab_get_all_repos.sh > list.txt
+./gitlab-repo-dl.sh all-repo-list > list.txt
 ```
 
 This can take quite a long time because it will call the API for each page of the list of projects, with 20 projects per page.
@@ -33,7 +33,7 @@ This can take quite a long time because it will call the API for each page of th
 Clone all the repositories from the list into a directory:
 
 ```sh
-bash gitlab_clone_from_list.sh list.txt ~/git
+./gitlab-repo-dl.sh from-list list.txt .
 ```
 
 This can take all long time for obvious reasons. When running the script multiple times, it will pull existing repositories.
