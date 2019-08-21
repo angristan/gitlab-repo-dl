@@ -32,7 +32,7 @@ if [ "$1" == "group" ]; then
         REPO_PATH="$GROUP_NAME/$(echo "$REPO_SSH_URL" | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')"
 
         if [ ! -d "$REPO_PATH" ]; then
-            echo "git clone "$REPO_PATH""
+            echo "git clone $REPO_PATH"
             git clone "$REPO_SSH_URL" "$REPO_PATH" --quiet
         else
             echo "git pull $REPO_PATH"
@@ -75,5 +75,5 @@ elif [ "$1" == "from-list" ]; then
             echo "git pull $REPO_PATH"
             cd "$TARGET_DIR/$REPO_PATH" && git pull --quiet
         fi
-    done <$LIST_FILE
+    done <"$LIST_FILE"
 fi
