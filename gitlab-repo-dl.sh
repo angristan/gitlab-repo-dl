@@ -26,10 +26,11 @@ if [ "$1" == "group" ]; then
 
     echo "Cloning all git projects in group $GROUP_NAME"
 
-    REPO_SSH_URLS=$(curl -s "$GITLAB_URL/api/v4/groups/$GROUP_NAME/projects?private_token=$GITLAB_TOKEN&per_page=999" | jq '.[] | .ssh_url_to_repo' | sed 's/"//g')
+    REPO_SSH_URLS=$(curl -s "$GITLAB_URL/api/v4/groups/$GROUP_NAME/projects?include_subgroups=true&private_token=$GITLAB_TOKEN&per_page=999" | jq '.[] | .ssh_url_to_repo' | sed 's/"//g')
 
     for REPO_SSH_URL in $REPO_SSH_URLS; do
-        REPO_PATH="$GROUP_NAME/$(echo "$REPO_SSH_URL" | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')"
+        FOLDER_PATH=$(echo "$REPO_SSH_URL" | awk -F'[:/]' '{for(i=2;i<=NF-1;i++)printf "%s/",$i;print ""}')
+        REPO_PATH="${FOLDER_PATH}$(echo "$REPO_SSH_URL" | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')"
 
         if [ ! -d "$REPO_PATH" ]; then
             echo "git clone $REPO_PATH"
