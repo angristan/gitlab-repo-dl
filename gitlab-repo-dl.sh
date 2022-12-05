@@ -26,18 +26,22 @@ if [ "$1" == "group" ]; then
 
     echo "Cloning all git projects in group $GROUP_NAME"
 
-    REPO_SSH_URLS=$(curl -s "$GITLAB_URL/api/v4/groups/$GROUP_NAME/projects?private_token=$GITLAB_TOKEN&per_page=999" | jq '.[] | .ssh_url_to_repo' | sed 's/"//g')
+    TOTAL_PAGES=`curl "$GITLAB_URL/api/v4/groups/$GROUP_NAME/projects?private_token=$GITLAB_TOKEN&per_page=999&include_subgroups=true" -sI | grep -i x-total-pages | awk '{print $2}' | sed 's/\\r//g'`
+    for ((PAGE_NUMBER = 1; PAGE_NUMBER <= TOTAL_PAGES; PAGE_NUMBER++)); do
+        # subgroups make for lots of repos
+        REPO_SSH_URLS=$(curl -s "$GITLAB_URL/api/v4/groups/$GROUP_NAME/projects?private_token=$GITLAB_TOKEN&per_page=999&include_subgroups=true&page=$PAGE_NUMBER" | jq '.[] | .ssh_url_to_repo' | sed 's/"//g')
 
-    for REPO_SSH_URL in $REPO_SSH_URLS; do
-        REPO_PATH="$GROUP_NAME/$(echo "$REPO_SSH_URL" | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')"
+        for REPO_SSH_URL in $REPO_SSH_URLS; do
+            REPO_PATH="$GROUP_NAME/$(echo "$REPO_SSH_URL" | awk -F'/' '{print $NF}' | awk -F'.' '{print $1}')"
 
-        if [ ! -d "$REPO_PATH" ]; then
-            echo "git clone $REPO_PATH"
-            git clone "$REPO_SSH_URL" "$REPO_PATH"
-        else
-            echo "git pull $REPO_PATH"
-            (cd "$REPO_PATH" && git pull)
-        fi
+            if [ ! -d "$REPO_PATH" ]; then
+                echo "git clone $REPO_PATH"
+                git clone "$REPO_SSH_URL" "$REPO_PATH"
+            else
+                echo "git pull $REPO_PATH"
+                (cd "$REPO_PATH" && git pull)
+            fi
+        done
     done
 elif [ "$1" == "all-repo-list" ]; then
     # Get total number of pages (with 20 projects per page) from HTTP header
